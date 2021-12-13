@@ -1,0 +1,158 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:emcommunity_fyp/ui/contactlist/add_contact.dart';
+import 'package:flutter/material.dart';
+
+class ContactListPage extends StatefulWidget {
+  ContactListPage({Key? key}) : super(key: key);
+
+  @override
+  _ContactListPageState createState() => _ContactListPageState();
+}
+
+class _ContactListPageState extends State<ContactListPage> {
+
+  String name = "";
+
+  @override
+  Widget build(BuildContext context) {
+
+    var size = MediaQuery.of(context).size;
+
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: Card(
+          child: TextField(
+            decoration: InputDecoration(
+              prefixIcon: Icon(Icons.search),
+              hintText: 'Search'
+            ),
+            onChanged: (val) {
+              setState(() {
+                 name = val;
+                            });
+            },
+          ),
+        ),
+      ),
+      
+      body: StreamBuilder<QuerySnapshot>(
+        stream: (name != "" && name != null)
+         ? FirebaseFirestore.instance
+          .collection('contacts')
+          .where("name")
+          .snapshots()
+         :FirebaseFirestore.instance.collection("contacts").snapshots(),
+        
+        builder: (context, snapshot){
+          return(snapshot.connectionState == ConnectionState.waiting)
+              ? Center(child: CircularProgressIndicator())
+              : ListView.builder(
+                  itemCount: snapshot.data!.docs.length,
+                  itemBuilder: (context, index) {
+                    DocumentSnapshot data = snapshot.data!.docs[index];
+                    return Container(
+                      padding: EdgeInsets.only(top: 16),
+                      child: Column (
+                        children: [
+                          ListTile(
+                            title: Text(data['name'],
+                                    style: TextStyle(
+                                      fontSize: 20, fontWeight: FontWeight.bold),
+                            ),
+                            trailing: Icon(
+                              Icons.add,
+                              color: Colors.red,
+                              size: 30,
+                            ),
+                          ),  
+                          Divider(thickness: 2,),
+                        ],
+                      ),
+                    );
+                  });
+        },
+      ),
+
+      
+
+      
+
+      
+
+      /*body: isLoading? Center(
+        child: Container(
+          height: size.height / 20, 
+          width: size.width /20,
+          child: CircularProgressIndicator(),)) 
+
+      :Column(
+        children: [
+          SizedBox(
+            height: size.height / 20,
+          ),
+          
+          Container(
+            height: size.height / 14,
+            width: size.width,
+            alignment: Alignment.center,
+            child: Container(
+              height: size.height / 14,
+              width: size.width / 1.15,
+              child: TextField(
+                controller: _search,
+                decoration: InputDecoration(
+                  hintText: "Search",
+                  icon: Icon(Icons.search),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          SizedBox(
+            height: size.height / 50,
+          ),
+          ElevatedButton(onPressed: (){ onSearch();}, 
+          child: Text("Search")
+          ),
+
+          SizedBox(
+            height: size.height / 30,
+          ),
+
+          userMap != null ? ListTile(
+            onTap: (){},
+            leading: Icon(Icons.account_box, color: Colors.black),
+            title: Text(
+              //userMap!['phoneNum'],
+              "${user.email}",
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 17,
+                fontWeight: FontWeight.w500,
+              ),),
+            subtitle: Text("${user.phoneNum}"),
+            trailing: Icon(Icons.add, color: Colors.red,),
+
+          ): Container(),
+        ],
+      ),*/
+    
+  
+
+      //button to add new contact
+      floatingActionButton: FloatingActionButton(
+        onPressed: (){
+          Navigator.push(context, MaterialPageRoute(builder: (context) => AddContactPage()));
+        },
+        tooltip: 'Increment',
+        child: Icon(Icons.add, color: Colors.black),
+        focusColor: Colors.red,
+      ),
+    );
+  }
+
+  
+}
